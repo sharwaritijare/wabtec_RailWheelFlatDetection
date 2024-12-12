@@ -9,20 +9,20 @@ from tensorflow.keras.preprocessing import image
 model = tf.keras.models.load_model('railcnn2.h5')
 model.summary()
 
-# Function to classify images and move "flat" images to a separate folder
+# func to classify flat images and move to folder
 def classify_and_move_images(source_folder, flat_folder):
-    # Create the output directory if it doesn't exist
+    # output directory
     os.makedirs(flat_folder, exist_ok=True)
 
-    # Loop through each image in the source folder
+    # looping through all images
     for filename in os.listdir(source_folder):
         if filename.endswith(".jpg") or filename.endswith(".png"):
             image_path = os.path.join(source_folder, filename)
 
-            # Predict if the image is "flat" or "non-flat"
-            result = predict_image(image_path)  # Modify predict_image to return result
+            # predict whether image is flat or nonflat
+            result = predict_image(image_path)  
 
-            # If the image is classified as "flat", move it to the flat_folder
+            # move flat images to folder
             if result == 'flat':
                 shutil.move(image_path, os.path.join(flat_folder, filename))
                 print(f"Moved {filename} to flat images folder.")
@@ -30,24 +30,24 @@ def classify_and_move_images(source_folder, flat_folder):
                 print(f"Image {filename} is classified as non-flat. Skipping.")
 
 
-# Modify the predict_image function to return 'flat' or 'no flat' for easier usage
+# prediction function to classify image as flat or nonflat
 def predict_image(image_path):
     test_image = image.load_img(image_path, target_size=(224, 224))
     test_image = image.img_to_array(test_image)
-    test_image = test_image / 255.0  # Normalize the image
+    test_image = test_image / 255.0  
     test_image = np.expand_dims(test_image, axis=0)
 
     result = model.predict(test_image)
 
-    # Return 'flat' or 'no flat' based on the prediction threshold
+    # returns flat or no flat based on prediction threshold
     if result[0] > 0.3:
-        return 'flat'  # Classifies as flat
+        return 'flat'  
     else:
-        return 'no flat'  # Classifies as non-flat
+        return 'no flat'  
 
 
-# Call the function to classify and move images
-source_folder = "C:/Users/mailv/OneDrive/Pictures/SourcePics"  # Folder with images to classify
-flat_folder = "C:/Users/mailv/OneDrive/Pictures/FlatResults"  # Folder to store "flat" images
+# calling func to classify and move images
+source_folder = "C:/Users/mailv/OneDrive/Pictures/SourcePics" # source folder containing images to be classified
+flat_folder = "C:/Users/mailv/OneDrive/Pictures/FlatResults"  
 
 classify_and_move_images(source_folder, flat_folder)
