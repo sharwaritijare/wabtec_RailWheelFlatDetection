@@ -9,7 +9,9 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras import regularizers
 from sklearn.metrics import confusion_matrix, classification_report
+import tkinter as tk
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # resize images function
 def resize_images(source_folder, target_size=(224, 224)):
@@ -138,3 +140,33 @@ y_pred = (cnn.predict(validation_generator) > 0.3).astype("int32")
 # confusion matrix and classification report
 print(confusion_matrix(y_true, y_pred))
 print(classification_report(y_true, y_pred))
+
+# function to plot confusion matrix
+def plot_confusion_matrix(y_true, y_pred):
+    cm = confusion_matrix(y_true, y_pred)
+
+    fig, ax = plt.subplots(figsize=(6, 5))
+    cax = ax.matshow(cm, cmap='Blues')
+    fig.colorbar(cax)
+
+    ax.set_xlabel('Predicted')
+    ax.set_ylabel('True')
+    ax.set_xticks(np.arange(len(cm)))
+    ax.set_yticks(np.arange(len(cm)))
+    ax.set_xticklabels(np.arange(1, len(cm) + 1))
+    ax.set_yticklabels(np.arange(1, len(cm) + 1))
+
+    for (i, j), value in np.ndenumerate(cm):
+        ax.text(j, i, f'{value}', ha='center', va='center', color='red')
+
+    root = tk.Tk()
+    root.title('Confusion Matrix')
+
+    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+
+    root.mainloop()
+
+# display confusion matrix
+plot_confusion_matrix(y_true, y_pred)
